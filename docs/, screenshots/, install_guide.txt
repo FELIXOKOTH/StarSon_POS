@@ -1,0 +1,8 @@
+StarSon-POS/
+├── starson_pos_full_deployment.zip
+├── README.md
+├── LICENSE
+└── docs/
+    ├── admin_spec.pdf
+    ├── architecture_diagram.png
+    └── integration_notes.txt
