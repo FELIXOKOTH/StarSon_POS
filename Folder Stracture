@@ -1,0 +1,16 @@
+StarSon_POS/
+│
+├── frontend/
+│   └── gui/main_gui.py
+│   └── assets/logo.png (placeholder)
+│
+├── backend/
+│   └── api/receipt_handler.py
+│   └── reports/report_generator.py
+│
+├── core/
+│   └── security/auth.py
+│   └── carbon_engine/carbon_calculator.py
+│
+├── README.md
+└── .gitignore
