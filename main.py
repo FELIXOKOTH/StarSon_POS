@@ -1,9 +1,12 @@
 # main.py
 
-from frontend.gui.main_gui import StarSonPOSApp
 import tkinter as tk
+from frontend.gui.main_gui import StarSonPOSApp
 
-if __name__ == "__main__":
+def launch_app():
     root = tk.Tk()
     app = StarSonPOSApp(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    launch_app()
