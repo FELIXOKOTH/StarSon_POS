@@ -1,0 +1,17 @@
+[
+    {
+        "username": "admin_naivas",
+        "password": "3c4a1f91336e43e1c2fc6df8378a2a91a1",
+        "role": "admin"
+    },
+    {
+        "username": "cashier001",
+        "password": "f56e2b5dbe2fae86a0aa13819de",
+        "role": "cashier"
+    },
+    {
+        "username": "manager_kiosk",
+        "password": "1a79a4d60de6718e8e5b326e338ae533",
+        "role": "manager"
+    }
+]
