@@ -1,0 +1,1 @@
+# receipt_logic.py - placeholder content

@@ -1,0 +1,1 @@
+# auth_core.py - placeholder content
