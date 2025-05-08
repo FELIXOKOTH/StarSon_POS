@@ -1,18 +1,22 @@
-# StarSon POS Data Import Module
-
-This module enables the seamless import of existing sales and inventory data from traditional POS systems into the StarSon POS platform.
+# StarSon POS Backend PDF Email Module
 
 ## Features
-- CSV and Excel file support
-- Simple validation system
-- Templates for sales and inventory
-
-## How to Use
-1. Place your CSV or Excel file in the directory.
-2. Run `import_tool.py`
-3. Follow on-screen instructions.
+- Generates PDF receipts from sales data.
+- Sends PDF to customer's email automatically.
 
 ## Structure
-- `import_tool.py`: Main script
-- `utils/`: Validator and logger
-- `templates/`: Sample files
+- `main.py` - Trigger logic.
+- `utils/` - PDF and email tools.
+- `receipts/` - PDF storage and templates.
+
+## GitHub Upload (Mobile)
+1. Go to https://github.com on your browser.
+2. Create a new repo (e.g., StarSon-POS-Backend).
+3. In repo, click **Add file > Upload files**.
+4. Upload the extracted contents of this zip.
+5. Commit directly to `main`.
+6. (Optional) Use GitHub mobile app for easier tracking.
+
+## Security
+- Use `.env` file to secure email credentials.
+- Ensure server limits access to `generated/` folder.
