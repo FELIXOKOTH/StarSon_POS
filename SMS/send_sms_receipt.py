@@ -23,6 +23,6 @@ sms_message = f"""
 Thank you for shopping with StarSon.
 Total: KES 300
 Download receipt: {receipt_url}
-(Note: Link expires in 72 hours)
+(Note: Link expires in 48 hours)
 """
 print(sms_message)
