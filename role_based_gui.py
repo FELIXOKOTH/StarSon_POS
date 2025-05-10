@@ -7,7 +7,7 @@ roles = {
         "can_install_frontend": True,
         "can_add_modules": True,
         "can_access_backend": False,
-        "can_create_users": False
+        "can_create_users": True
     },
     "department_officer": {
         "can_install_frontend": True,
