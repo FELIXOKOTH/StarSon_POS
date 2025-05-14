@@ -57,7 +57,7 @@ StarSon POS is a modular, eco-friendly Point-of-Sale system developed by BRIGHTA
 
 - Default admin credentials:
   - **Username:** `admin`
-  - **Password:** `YourLegacy1994`
+  - **Password:** `..............`
 - Please change after first login.
 
 ## License
