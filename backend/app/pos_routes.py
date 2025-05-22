@@ -1,1 +1,0 @@
-# POS transaction routes
