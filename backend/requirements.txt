@@ -1,1 +1,1 @@
-# Sample content for requirements.txt
+Flask==2.3.2
