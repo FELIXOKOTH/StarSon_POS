@@ -1,0 +1,11 @@
+
+
+{
+  "cashier_id": "Cashier ID",
+  "start_shift": "Start Shift",
+  "break_shift": "Break Shift",
+  "end_break": "End Break",
+  "end_shift": "End Shift",
+  "report": "Shift Report",
+  "select_language": "Select Language"
+}
