@@ -7,6 +7,8 @@ class ShiftApp:
         self.root = root
         self.root.title("StarSon POS | Shift Panel")
         self.cashier_id = tk.StringVar()
+        self.sales_entry = tk.Entry(root)
+        self.sales_entry.pack(pady=5)
 
         tk.Label(root, text="Cashier ID:").pack(pady=5)
         tk.Entry(root, textvariable=self.cashier_id).pack(pady=5)
@@ -31,7 +33,7 @@ class ShiftApp:
 
     def end_shift(self):
         try:
-            sales_total = float(input("Enter total sales amount: "))
+            sales_total = float(self.sales_entry.get())
             shift_manager.end_shift(self.cashier_id.get(), sales_total)
             messagebox.showinfo("Shift Ended", "Shift ended and logged.")
         except ValueError:
