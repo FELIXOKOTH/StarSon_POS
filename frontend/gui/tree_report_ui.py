@@ -52,14 +52,21 @@ class TreeReportApp:
         self.label.config(text=f"Trees Saved: {trees_saved:.4f}")
 
     def update_trees(self):
-        try:
-            new_value = int(self.entry.get())
-            if new_value < 0:
-                raise ValueError
-            self.treesaver.receipts_avoided = new_value
-            self.refresh_label()
-        except ValueError:
-            messagebox.showerror("Input Error", "Please enter a valid non-negative number.")
+       try:
+    new_value = int(self.entry.get())
+    if new_value < 0:
+        raise ValueError
+
+    # Simulate batch logging
+    current_ids = self.treesaver.digital_receipts
+    new_ids = {f"SIMULATED_{i}" for i in range(len(current_ids), new_value)}
+    for rid in new_ids:
+        self.treesaver.log_receipt(rid, 'sms')  # Assuming 'sms' method for simplicity
+
+    self.refresh_label()
+except ValueError:
+    messagebox.showerror("Input Error", "Please enter a valid non-negative number.")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
