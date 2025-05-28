@@ -1,7 +1,7 @@
 
 import sqlite3
 import bcrypt
-
+ 
 conn = sqlite3.connect('starson_pos.db')
 cursor = conn.cursor()
 
