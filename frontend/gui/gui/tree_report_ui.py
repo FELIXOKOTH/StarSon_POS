@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from tree_saver import TreeSaver
 
 class TreeReportApp:
@@ -13,11 +14,21 @@ class TreeReportApp:
             "dark": {"bg": "#2c2c2c", "fg": "#fff"}
         }
 
-        self.root.geometry("300x200")
+        self.root.geometry("300x250")
         self.root.resizable(False, False)
 
         self.label = tk.Label(root, text="", font=("Arial", 14))
-        self.label.pack(pady=20)
+        self.label.pack(pady=10)
+
+        self.entry_label = tk.Label(root, text="Receipts Avoided:", font=("Arial", 10))
+        self.entry_label.pack()
+
+        self.entry = tk.Entry(root)
+        self.entry.insert(0, str(self.treesaver.receipts_avoided))  # default value
+        self.entry.pack(pady=5)
+
+        self.update_button = tk.Button(root, text="Update Trees Saved", command=self.update_trees)
+        self.update_button.pack(pady=5)
 
         self.toggle_button = tk.Button(root, text="Switch Theme", command=self.toggle_theme)
         self.toggle_button.pack(pady=10)
@@ -32,12 +43,23 @@ class TreeReportApp:
     def apply_theme(self):
         theme = self.themes[self.current_theme]
         self.root.configure(bg=theme["bg"])
-        self.label.configure(bg=theme["bg"], fg=theme["fg"])
-        self.toggle_button.configure(bg=theme["bg"], fg=theme["fg"])
+        widgets = [self.label, self.entry_label, self.entry, self.update_button, self.toggle_button]
+        for widget in widgets:
+            widget.configure(bg=theme["bg"], fg=theme["fg"])
 
     def refresh_label(self):
         trees_saved = self.treesaver.calculate_trees_saved()
         self.label.config(text=f"Trees Saved: {trees_saved:.4f}")
+
+    def update_trees(self):
+        try:
+            new_value = int(self.entry.get())
+            if new_value < 0:
+                raise ValueError
+            self.treesaver.receipts_avoided = new_value
+            self.refresh_label()
+        except ValueError:
+            messagebox.showerror("Input Error", "Please enter a valid non-negative number.")
 
 if __name__ == "__main__":
     root = tk.Tk()
