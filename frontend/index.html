@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StarSon POS</title>
+  <link rel="stylesheet" href="css/starson.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</head>
+<body>
+  <div id="admin-panel">
+    <h2>Admin Login</h2>
+    <input type="text" id="admin-user" placeholder="Username" />
+    <input type="password" id="admin-pass" placeholder="Password" />
+    <button onclick="adminLogin()">Login</button>
+  </div>
+
+  <div id="main-app" style="display: none;">
+    <div id="google_translate_element"></div>
+
+    <h1>StarSon POS System</h1>
+
+    <label for="payment-method">Payment Method:</label>
+    <select id="payment-method">
+      <option value="cash">Cash</option>
+      <option value="mpesa">M-Pesa</option>
+      <option value="card">Card</option>
+      <option value="credit">Credit</option>
+      <option value="mixed">Mixed</option>
+    </select>
+
+    <div id="product-list">
+      <!-- Products added dynamically -->
+    </div>
+
+    <button onclick="exportInventory()">Export Inventory</button>
+    <button onclick="checkout()">Checkout</button>
+
+    <div id="receipt-modal" style="display: none;">
+      <h2>Receipt</h2>
+      <div id="receipt-summary"></div>
+      <div id="tree-summary"></div>
+      <button onclick="downloadReceiptAsPDF()">Download PDF</button>
+    </div>
+  </div>
+
+  <script>
+    const adminCredentials = { username: "admin", password: "StarSon2025" };
+
+    function adminLogin() {
+      const user = document.getElementById("admin-user").value;
+      const pass = document.getElementById("admin-pass").value;
+      if (user === adminCredentials.username && pass === adminCredentials.password) {
+        document.getElementById("admin-panel").style.display = "none";
+        document.getElementById("main-app").style.display = "block";
+      } else {
+        alert("Invalid admin credentials");
+      }
+    }
+
+    function checkout() {
+      const method = document.getElementById("payment-method").value;
+      const receiptSummary = document.getElementById("receipt-summary");
+      const treeSummary = document.getElementById("tree-summary");
+      receiptSummary.innerHTML = `<p>Payment Method: ${method}</p><p>Total: KES 500</p>`;
+
+      const treesSaved = (1 / 8500).toFixed(4);
+      treeSummary.innerHTML = `<p>Trees Saved: ${treesSaved}</p>`;
+
+      document.getElementById("receipt-modal").style.display = "block";
+    }
+
+    function downloadReceiptAsPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("StarSon POS Receipt", 10, 10);
+      const summary = document.getElementById("receipt-summary").innerText + '\n' + document.getElementById("tree-summary").innerText;
+      doc.text(summary, 10, 20);
+      doc.save("receipt.pdf");
+    }
+
+    function exportInventory() {
+      const data = ["Product,Qty,Price", "Milk,10,50", "Bread,5,30"];
+      const blob = new Blob([data.join("\n")], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "inventory.csv";
+      a.click();
+    }
+
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({ pageLanguage: 'en' }, 'google_translate_element');
+    }
+  </script>
+</body>
+</html>
