@@ -1,7 +1,7 @@
 
 # StarSon POS Enhancements
 
-StarSon POS is a modular, eco-friendly Point-of-Sale system developed by BRIGHTARM Enterprise. This repository contains enhancements aimed at addressing modern POS system challenges while promoting sustainability and global compliance.
+StarSon POS is a modular, eco-friendly Point-of-Sale system developed by BRIGHTARM Enterprise in collaboration with Greenpeace Africa. This repository contains enhancements aimed at addressing modern POS system challenges while promoting sustainability and global compliance.
 
 ## Key Enhancements Included
 
@@ -37,7 +37,7 @@ StarSon POS is a modular, eco-friendly Point-of-Sale system developed by BRIGHTA
 
 1. Clone the repository or upload files manually:
    ```bash
-   git clone https://github.com/your-username/StarSon-POS.git
+   git clone https://github.com/your-felixokoth/StarSon_POS.git
    ```
 
 2. Unzip and place contents in relevant `frontend` and `backend` folders.
