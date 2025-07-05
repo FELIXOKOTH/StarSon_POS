@@ -37,7 +37,7 @@ StarSon POS is a modular, eco-friendly Point-of-Sale system developed by BRIGHTA
 
 1. Clone the repository or upload files manually:
    ```bash
-   git clone https://github.com/your-felixokoth/StarSon_POS.git
+   git clone https://github.com/............./Star...........git
    ```
 
 2. Unzip and place contents in relevant `frontend` and `backend` folders.
