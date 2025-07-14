@@ -11,8 +11,8 @@
 <body>
   <div id="admin-panel">
     <h2>Admin Login</h2>
-    <input type="text" id="admin" placeholder="Username" />
-    <input type="password" id="pass" placeholder="Password" />
+    <input type="text" id="admin-user" placeholder="Username" />
+    <input type="password" id="admin-pass" placeholder="Password" />
     <button onclick="adminLogin()">Login</button>
   </div>
 
@@ -42,7 +42,13 @@
       <div id="receipt-summary"></div>
       <div id="tree-summary"></div>
       <button onclick="downloadReceiptAsPDF()">Download PDF</button>
+      <button onclick="alert('Feature coming soon: Send by Email or SMS')">Send via Email/SMS</button>
     </div>
+  </div>
+
+  <div style="margin-top: 20px; text-align: center;">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://felixokoth.github.io/StarSon_POS/frontend/" alt="QR to StarSon POS" />
+    <p>Scan to try StarSon POS</p>
   </div>
 
   <script>
