@@ -7,6 +7,8 @@ import smtplib
 from email.message import EmailMessage
 import os
 import datetime
+from twilio.rest import Client
+from dotenv import load_dotenv
 
 # === Configurable Email Details ===
 SMTP_SERVER = 'smtp.gmail.com'
