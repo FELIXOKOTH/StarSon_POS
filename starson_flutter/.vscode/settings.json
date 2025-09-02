@@ -1,0 +1,4 @@
+{
+  "dart.flutterSdkPath": "/usr/local/flutter",
+  "dart.flutterWebRenderer": "html"
+}

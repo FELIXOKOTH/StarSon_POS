@@ -1,0 +1,80 @@
+[debug] [2025-09-02T12:27:56.018Z] ----------------------------------------------------------------------
+[debug] [2025-09-02T12:27:56.021Z] Command:       /usr/local/share/nvm/versions/node/v22.17.0/bin/node /home/codespace/nvm/current/bin/firebase init functions
+[debug] [2025-09-02T12:27:56.022Z] CLI Version:   14.15.1
+[debug] [2025-09-02T12:27:56.022Z] Platform:      linux
+[debug] [2025-09-02T12:27:56.022Z] Node Version:  v22.17.0
+[debug] [2025-09-02T12:27:56.023Z] Time:          Tue Sep 02 2025 12:27:56 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-09-02T12:27:56.023Z] Env Overrides: GITHUB_API_URL, GITHUB_API_URL
+[debug] [2025-09-02T12:27:56.023Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-09-02T12:27:56.362Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-02T12:27:56.362Z] > authorizing via signed-in user (okotieya404@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /workspaces/StarSon_POS
+
+Before we get started, keep in mind:
+
+  * You are currently outside your home directory
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-09-02T12:27:56.365Z] Using project from CLI flag: starson-pos-2025
+[debug] [2025-09-02T12:27:56.366Z] Checked if tokens are valid: true, expires at: 1756818548646
+[debug] [2025-09-02T12:27:56.366Z] Checked if tokens are valid: true, expires at: 1756818548646
+[debug] [2025-09-02T12:27:56.367Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/starson-pos-2025 [none]
+[debug] [2025-09-02T12:27:56.865Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/starson-pos-2025 200
+[debug] [2025-09-02T12:27:56.865Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/starson-pos-2025 {"projectId":"starson-pos-2025","projectNumber":"365499300665","displayName":"StarSon","name":"projects/starson-pos-2025","resources":{"hostingSite":"starson-pos-2025"},"state":"ACTIVE","etag":"1_18adb1c3-b581-4d8e-8410-87175fc4e0dc"}
+[info] i  Using project starson-pos-2025 (StarSon) 
+[info] 
+=== Functions Setup
+[debug] [2025-09-02T12:27:57.013Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-09-02T12:27:57.013Z] > authorizing via signed-in user (okotieya404@gmail.com)
+[debug] [2025-09-02T12:27:57.013Z] [iam] checking project starson-pos-2025 for permissions ["firebase.projects.get"]
+[debug] [2025-09-02T12:27:57.013Z] Checked if tokens are valid: true, expires at: 1756818548646
+[debug] [2025-09-02T12:27:57.013Z] Checked if tokens are valid: true, expires at: 1756818548646
+[debug] [2025-09-02T12:27:57.014Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/starson-pos-2025:testIamPermissions [none]
+[debug] [2025-09-02T12:27:57.014Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/starson-pos-2025:testIamPermissions x-goog-quota-user=projects/starson-pos-2025
+[debug] [2025-09-02T12:27:57.014Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/starson-pos-2025:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2025-09-02T12:27:58.502Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/starson-pos-2025:testIamPermissions 200
+[debug] [2025-09-02T12:27:58.502Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/starson-pos-2025:testIamPermissions {"permissions":["firebase.projects.get"]}
+[info] 
+Detected existing codebase(s): default
+
+[info] Let's create a new codebase for your functions.
+[info] A directory corresponding to the codebase will be created in your project
+[info] with sample code pre-configured.
+
+[info] See https://firebase.google.com/docs/functions/organize-functions for
+[info] more information on organizing your functions using codebases.
+
+[info] Functions can be deployed with firebase deploy.
+
+[info] ✔  Wrote starson-functions/package.json 
+[info] ✔  Wrote starson-functions/.eslintrc.js 
+[info] ✔  Wrote starson-functions/index.js 
+[info] ✔  Wrote starson-functions/.gitignore 
+[info] 
+[info] ✔  Wrote configuration info to firebase.json 
+[info] ✔  Wrote project information to .firebaserc 
+[debug] [2025-09-02T12:32:57.612Z] Error: EISDIR: illegal operation on a directory, open '/workspaces/StarSon_POS/.gitignore'
+    at Object.writeFileSync (node:fs:2425:20)
+    at Object.createFileSync (/usr/local/share/nvm/versions/node/v22.17.0/lib/node_modules/firebase-tools/node_modules/fs-extra/lib/ensure/file.js:63:6)
+    at Config.writeProjectFile (/usr/local/share/nvm/versions/node/v22.17.0/lib/node_modules/firebase-tools/lib/config.js:160:12)
+    at Command.initAction [as actionFn] (/usr/local/share/nvm/versions/node/v22.17.0/lib/node_modules/firebase-tools/lib/commands/init.js:219:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[error] 
+[error] Error: An unexpected error has occurred.

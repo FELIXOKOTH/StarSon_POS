@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "365499300665",
+    "project_id": "starson-pos-2025",
+    "storage_bucket": "starson-pos-2025.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:365499300665:android:4db6115a21681edf9146e8",
+        "android_client_info": {
+          "package_name": "com.example.starson_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAigKPJge5k8tfzN9eDpKcU6E_n-icxRjQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

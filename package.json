@@ -1,0 +1,12 @@
+{
+  "name": "starson_pos",
+  "version": "1.0.0",
+  "description": "**StarSon POS** is a futuristic, eco-conscious point-of-sale system developed by **BRIGHT_ARM ENTERPRISE**. Designed with modular architecture, this POS enables eco-receipt functionality, secure cashier access, carbon credits tracking, and seamless integration with external green platforms like **MITI PESA Initiative**.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
