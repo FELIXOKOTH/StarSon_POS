@@ -24,11 +24,11 @@ class Apillo:
         
         # --- Simulated Apillo Response ---
         if "ESG" in prompt:
-            insight = f"The reduction of {data_packet['estimated_carbon_reduction_kg']:.4f} kg of CO2e is a significant step. To improve further, consider partnering with a local environmental group to amplify your impact. Your {data_packet['digital_receipts']} digital receipts show strong customer adoption of your green initiatives."
+            insight = f"The reduction of {data_packet['estimated_carbon_reduction_kg']:.4f} kg of CO2e and saving {data_packet['water_saved_liters']:.2f} liters of water are significant steps. The community donation of KES {data_packet['community_give_back_kes']:.2f} also strengthens social bonds. To improve further, consider sourcing from local suppliers to reduce supply chain emissions."
             return {"esg_insight": insight}
         else:
             peak_hour = max(data_packet.get("sales_by_hour", {}), key=data_packet.get("sales_by_hour", {}).get)
-            insight = f"Today's peak activity was around {peak_hour}:00. Preparing for this time tomorrow could enhance customer flow. The {data_packet['eco_metrics']['digital_receipts_issued']} digital receipts are a great sustainability achievement!"
+            insight = f"Today's peak activity was around {peak_hour}:00. The {data_packet['eco_metrics']['digital_receipts_issued']} digital receipts are a great sustainability achievement!"
             return {"operational_insight": insight}
 
     def _process_transactions(self, transactions_dict):
@@ -71,33 +71,52 @@ class Apillo:
     def calculate_environmental_impact(self, transactions_dict):
         """
         Calculates key environmental metrics based on transaction data.
-        This is a core function for the ESG/Climate Tool capability.
         """
         processed_data = self._process_transactions(transactions_dict)
         digital_receipts = processed_data['digital_receipts']
 
-        # Placeholder calculations for environmental impact:
-        # - Trees Saved: Based on industry estimates for paper production.
-        # - Carbon Reduction: Based on reduced paper production & printing energy.
+        # --- Expanded placeholder calculations for environmental impact ---
         trees_saved = round(digital_receipts * 0.0001, 5)
-        carbon_reduction_kg = round(digital_receipts * 0.0015, 4) # (1g paper + 0.5g energy)/receipt
+        carbon_reduction_kg = round(digital_receipts * 0.0015, 4)
+        water_saved_liters = round(digital_receipts * 0.05, 2) # Estimate of water saved per receipt
+        waste_diverted_kg = round(digital_receipts * 0.0015, 4) # Estimate of paper weight
 
         return {
             "digital_receipts": digital_receipts,
             "trees_saved_estimate": trees_saved,
-            "estimated_carbon_reduction_kg": carbon_reduction_kg
+            "estimated_carbon_reduction_kg": carbon_reduction_kg,
+            "water_saved_liters": water_saved_liters,
+            "waste_diverted_kg": waste_diverted_kg
         }
 
-    def get_sustainability_insights(self, environmental_data):
+    def calculate_social_impact(self, environmental_data):
         """
-        Provides actionable ESG insights based on environmental metrics.
+        Calculates social contribution metrics.
         """
-        prompt = f"""
+        # Example: Donate KES 1 for every 10 digital receipts
+        donation_per_receipt_block = 1.0
+        receipt_block_size = 10
+        num_blocks = environmental_data['digital_receipts'] // receipt_block_size
+        community_give_back = round(num_blocks * donation_per_receipt_block, 2)
+
+        return {
+            "community_give_back_kes": community_give_back,
+            "program_description": f"Donating KES {donation_per_receipt_block} to local charities for every {receipt_block_size} paperless transactions."
+        }
+
+    def get_sustainability_insights(self, environmental_data, social_data):
+        """
+        Provides actionable ESG insights based on environmental and social metrics.
+        """
+        # Combine all data into one packet for the AI
+        full_esg_packet = {**environmental_data, **social_data}
+
+        prompt = f'''
         You are Apillo, a specialized ESG and Climate analytics AI.
-        Analyze the provided JSON data, which contains environmental impact metrics from a company's operations.
+        Analyze the provided JSON data, which contains environmental and social impact metrics from a company's operations.
         Provide one brief, actionable insight to help them improve their sustainability efforts. The tone should be professional and encouraging.
-        """
-        return self._call_llm_api(prompt, environmental_data)
+        '''
+        return self._call_llm_api(prompt, full_esg_packet)
 
     def generate_daily_summary(self, transactions_dict):
         """
@@ -108,14 +127,17 @@ class Apillo:
         
         full_summary = {
             **processed_data,
-            "eco_metrics": eco_metrics
+            "eco_metrics": {
+                "digital_receipts_issued": eco_metrics['digital_receipts'],
+                "trees_saved": eco_metrics['trees_saved_estimate']
+            }
         }
 
-        prompt = f"""
+        prompt = f'''
         You are Apillo, an expert business analyst AI for StarSon POS.
         Provide one brief, actionable operational insight from the daily sales JSON data.
         Your tone should be futuristic and concise.
-        """
+        '''
 
         operational_insight = self._call_llm_api(prompt, full_summary)['operational_insight']
         

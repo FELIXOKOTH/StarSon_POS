@@ -114,13 +114,20 @@ def index():
             if (!response.ok) throw new Error(report.error || 'Failed to get ESG report.');
 
             panel.innerHTML = `<h3>Apillo's ESG Impact Report</h3>
-                               <p>Based on today's transactions:</p>
-                               <ul>
-                                   <li><b>Digital Receipts Issued:</b> ${report.environmental_impact.digital_receipts}</li>
-                                   <li><b>Estimated Trees Saved:</b> ${report.environmental_impact.trees_saved_estimate}</li>
-                                   <li><b>Estimated Carbon Reduction:</b> ${report.environmental_impact.estimated_carbon_reduction_kg} kg CO2e</li>
-                               </ul>
-                               <p><b>Sustainability Insight:</b> ${report.sustainability_insight.esg_insight}</p>`;
+                <p>Based on today's <b>${report.environmental_impact.digital_receipts}</b> paperless transactions:</p>
+                <h4>Environmental Impact:</h4>
+                <ul>
+                    <li><b>Carbon Reduction:</b> ${report.environmental_impact.estimated_carbon_reduction_kg} kg CO2e</li>
+                    <li><b>Water Saved:</b> ${report.environmental_impact.water_saved_liters} Liters</li>
+                    <li><b>Waste Diverted from Landfill:</b> ${report.environmental_impact.waste_diverted_kg} kg</li>
+                    <li><b>Trees Saved (Estimate):</b> ${report.environmental_impact.trees_saved_estimate}</li>
+                </ul>
+                <h4>Social Impact:</h4>
+                <ul>
+                    <li><b>Community Give-Back:</b> KES ${report.social_impact.community_give_back_kes.toFixed(2)}</li>
+                    <li><em>Program: ${report.social_impact.program_description}</em></li>
+                </ul>
+                <p><b>Apillo's Sustainability Insight:</b> ${report.sustainability_insight.esg_insight}</p>`;
             panel.style.display = 'block';
 
         } catch (error) {
@@ -189,17 +196,20 @@ def get_daily_summary_route():
 def get_esg_report_route():
     """
     This endpoint demonstrates Apillo's independent ESG capability.
-    An external system could call this with its own transaction data.
     """
     try:
-        # 1. Calculate the core environmental metrics
+        # 1. Calculate Environmental Impact
         environmental_impact = apillo_agent.calculate_environmental_impact(transactions)
         
-        # 2. Get an intelligent insight based on those metrics
-        sustainability_insight = apillo_agent.get_sustainability_insights(environmental_impact)
+        # 2. Calculate Social Impact
+        social_impact = apillo_agent.calculate_social_impact(environmental_impact)
+
+        # 3. Get an intelligent insight based on both data points
+        sustainability_insight = apillo_agent.get_sustainability_insights(environmental_impact, social_impact)
 
         return jsonify({
             "environmental_impact": environmental_impact,
+            "social_impact": social_impact,
             "sustainability_insight": sustainability_insight
         })
     except Exception as e:
