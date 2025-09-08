@@ -9,6 +9,7 @@
     pkgs.python311
     pkgs.python311Packages.pip
     pkgs.python311Packages.flask
+    pkgs.python311Packages.python-dotenv
     pkgs.flutter
     pkgs.firebase-tools
     pkgs.nodejs_20
