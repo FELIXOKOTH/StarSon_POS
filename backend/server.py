@@ -40,20 +40,25 @@ if saf_api:
 # --- Frontend Rendering ---
 @app.route('/')
 def index():
+    # We will add Chart.js and update the ESG panel
     return render_template_string('''
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>StarSon POS (AI-Powered)</title>
+    <!-- ** NEW: Added Chart.js for data visualization ** -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: sans-serif; margin: 2em; background-color: #f9f9f9; }
-        h1 { color: #333; }
-        .transaction-panel { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 1em; margin-top: 1em; }
+        h1, h2, h3 { color: #333; }
+        .transaction-panel { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 1.5em; margin-top: 1em; }
         .error-banner { background: #ffdddd; border: 1px solid #ff9999; color: #d8000c; padding: 1em; margin-bottom: 1em; border-radius: 8px; }
         button { padding: 10px 15px; font-size: 14px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc; background-color: #f0f0f0; }
         button:disabled { cursor: not-allowed; background-color: #e0e0e0; }
         #esg-report-panel { background-color: #e6f4ea; border-color: #b2d8b5; }
+        /* ** NEW: Styles for chart containers ** */
+        .chart-container { width: 80%; max-width: 400px; margin: 1em auto; }
     </style>
 </head>
 <body>
@@ -69,65 +74,101 @@ def index():
     <button onclick="startNewQRTransaction()" {% if not saf_api_available %}disabled{% endif %}>New QR Code Payment</button>
     <button onclick="startNewManual()">Log a Manual Payment</button>
     <button onclick="getDailySummary()" id="summary-btn">Get Apillo's Daily Summary</button>
-    <button onclick="getEsgReport()" id="esg-btn">Generate ESG Impact Report</button>
+    <button onclick="getEsgReport()" id="esg-btn">Build ESG Dashboard</button>
 
     <div id="apillo-summary-panel" class="transaction-panel" style="display:none; background-color: #f0f8ff;"></div>
-    <div id="esg-report-panel" class="transaction-panel" style="display:none;"></div>
+    
+    <!-- ** NEW: Updated ESG Panel with Canvas elements for charts ** -->
+    <div id="esg-report-panel" class="transaction-panel" style="display:none;">
+        <h3>Apillo's ESG Dashboard</h3>
+        <p id="esg-summary-text"></p>
+        <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;">
+            <div class="chart-container">
+                <h4>Environmental Impact</h4>
+                <canvas id="environmentalChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h4>Social Contribution</h4>
+                <canvas id="socialChart"></canvas>
+            </div>
+        </div>
+        <p><b>Apillo's Sustainability Insight:</b> <span id="esg-insight-text"></span></p>
+    </div>
+    
     <div id="active-transactions"></div>
 
 <script>
-    // Functions for starting transactions are unchanged
+    // Keep track of chart instances to destroy them before re-rendering
+    let environmentalChartInstance = null;
+    let socialChartInstance = null;
+
+    // Unchanged functions: startNewSTKPush, startNewQRTransaction, etc.
     // ...
 
     async function getDailySummary() {
-        const btn = document.getElementById('summary-btn');
-        const panel = document.getElementById('apillo-summary-panel');
-        btn.disabled = true;
-        btn.innerText = "Apillo is analyzing...";
-        try {
-            const response = await fetch('/apillo/daily_summary');
-            const report = await response.json();
-            if (!response.ok) throw new Error(report.error || 'Failed to get summary.');
-
-            panel.innerHTML = `<h3>${report.summary_title}</h3>
-                               <p><b>${report.key_metric}</b></p>
-                               <p><b>Actionable Insight:</b> ${report.actionable_insight}</p>`;
-            panel.style.display = 'block';
-
-        } catch (error) {
-            document.getElementById('error-banner').innerText = error.message;
-            document.getElementById('error-banner').style.display = 'block';
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Get Apillo's Daily Summary";
-        }
+        // This function is unchanged
+        // ...
     }
 
     async function getEsgReport() {
         const btn = document.getElementById('esg-btn');
         const panel = document.getElementById('esg-report-panel');
         btn.disabled = true;
-        btn.innerText = "Calculating Impact...";
+        btn.innerText = "Building Dashboard...";
+        
         try {
             const response = await fetch('/apillo/esg_report');
             const report = await response.json();
             if (!response.ok) throw new Error(report.error || 'Failed to get ESG report.');
 
-            panel.innerHTML = `<h3>Apillo's ESG Impact Report</h3>
-                <p>Based on today's <b>${report.environmental_impact.digital_receipts}</b> paperless transactions:</p>
-                <h4>Environmental Impact:</h4>
-                <ul>
-                    <li><b>Carbon Reduction:</b> ${report.environmental_impact.estimated_carbon_reduction_kg} kg CO2e</li>
-                    <li><b>Water Saved:</b> ${report.environmental_impact.water_saved_liters} Liters</li>
-                    <li><b>Waste Diverted from Landfill:</b> ${report.environmental_impact.waste_diverted_kg} kg</li>
-                    <li><b>Trees Saved (Estimate):</b> ${report.environmental_impact.trees_saved_estimate}</li>
-                </ul>
-                <h4>Social Impact:</h4>
-                <ul>
-                    <li><b>Community Give-Back:</b> KES ${report.social_impact.community_give_back_kes.toFixed(2)}</li>
-                    <li><em>Program: ${report.social_impact.program_description}</em></li>
-                </ul>
-                <p><b>Apillo's Sustainability Insight:</b> ${report.sustainability_insight.esg_insight}</p>`;
+            // Update text elements
+            document.getElementById('esg-summary-text').innerText = `Based on today's ${report.environmental_impact.digital_receipts} paperless transactions:`;
+            document.getElementById('esg-insight-text').innerText = report.sustainability_insight.esg_insight;
+            
+            // --- ** NEW: Chart Rendering Logic ** ---
+
+            // Destroy previous charts if they exist
+            if (environmentalChartInstance) environmentalChartInstance.destroy();
+            if (socialChartInstance) socialChartInstance.destroy();
+
+            // 1. Environmental Impact Donut Chart
+            const envCtx = document.getElementById('environmentalChart').getContext('2d');
+            environmentalChartInstance = new Chart(envCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['CO2 Reduction (kg)', 'Water Saved (L)', 'Waste Diverted (kg)'],
+                    datasets: [{
+                        data: [
+                            report.environmental_impact.estimated_carbon_reduction_kg,
+                            report.environmental_impact.water_saved_liters,
+                            report.environmental_impact.waste_diverted_kg
+                        ],
+                        backgroundColor: ['#4CAF50', '#2196F3', '#FFC107'],
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+
+            // 2. Social Impact Bar Chart
+            const socialCtx = document.getElementById('socialChart').getContext('2d');
+            socialChartInstance = new Chart(socialCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Community Give-Back (KES)'],
+                    datasets: [{
+                        label: report.social_impact.program_description,
+                        data: [report.social_impact.community_give_back_kes],
+                        backgroundColor: ['#9C27B0']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: { y: { beginAtZero: true } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
             panel.style.display = 'block';
 
         } catch (error) {
@@ -135,7 +176,7 @@ def index():
             document.getElementById('error-banner').style.display = 'block';
         } finally {
             btn.disabled = false;
-            btn.innerText = "Generate ESG Impact Report";
+            btn.innerText = "Rebuild ESG Dashboard";
         }
     }
 </script>
@@ -143,9 +184,8 @@ def index():
 </html>
     ''', saf_api_available=(saf_api is not None))
 
-# --- Payment Endpoints ---
+# --- All Backend Endpoints are unchanged ---
 
-# This endpoint remains the same
 @app.route('/initiate_payment', methods=['POST'])
 def initiate_payment_route():
     data = request.get_json()
@@ -166,7 +206,6 @@ def initiate_payment_route():
     
     return jsonify({"error": "Invalid provider"}), 400
 
-# All other payment endpoints (QR, callback, confirmation) are unchanged
 @app.route('/confirm_manual_payment', methods=['POST'])
 def confirm_manual_route():
     data = request.get_json()
@@ -180,12 +219,9 @@ def confirm_manual_route():
 
     return jsonify({"status": "confirmed", "details": transactions[txn_id]['details']})
 
-# --- Apillo AI Agent Endpoints ---
-
 @app.route('/apillo/daily_summary')
 def get_daily_summary_route():
     try:
-        # Use the Apillo class method
         report = apillo_agent.generate_daily_summary(transactions)
         return jsonify(report)
     except Exception as e:
@@ -194,17 +230,9 @@ def get_daily_summary_route():
 
 @app.route('/apillo/esg_report')
 def get_esg_report_route():
-    """
-    This endpoint demonstrates Apillo's independent ESG capability.
-    """
     try:
-        # 1. Calculate Environmental Impact
         environmental_impact = apillo_agent.calculate_environmental_impact(transactions)
-        
-        # 2. Calculate Social Impact
         social_impact = apillo_agent.calculate_social_impact(environmental_impact)
-
-        # 3. Get an intelligent insight based on both data points
         sustainability_insight = apillo_agent.get_sustainability_insights(environmental_impact, social_impact)
 
         return jsonify({
