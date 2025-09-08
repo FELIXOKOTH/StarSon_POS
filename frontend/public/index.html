@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StarSon POS</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon"href=%PUBLIC_URL%favicon.ico'/>
 </head>
 <body>
-    <header>
-        <h1>Welcome to StarSon POS</h1>
-        <p>Powered by BRIGHTARM ENTERPRISE</p>
-    </header>
-    <section id="intro">
-        <p>This is the secure frontend portal for StarSon POS. Visit our parent company at <a href="https://www.brightarm.co.ke">brightarm.co.ke</a>.</p>
-    </section>
-    <footer>
-        <p>&copy; 2025 BRIGHTARM ENTERPRISE</p>
-    </footer>
+    <h1>Welcome to StarSon POS</h1>
+
+    <h2>Create Inventory from Image</h2>
+    <form id="inventoryForm">
+        <input type="file" id="imageFile" name="image" accept="image/*">
+        <button type="submit">Analyze Image</button>
+    </form>
+
+    <h3>Inventory Results:</h3>
+    <div id="results"></div>
+
     <script src="script.js"></script>
 </body>
 </html>
