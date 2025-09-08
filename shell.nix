@@ -1,13 +1,15 @@
-{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") {} }:
-
+{ pkgs ? import <nixpkgs> {} }:
 pkgs.mkShell {
   buildInputs = [
-    pkgs.python311
-    pkgs.python311Packages.pip
-    pkgs.python311Packages.flask
-    pkgs.python311Packages.python-dotenv
-    pkgs.flutter
-    pkgs.firebase-tools
-    pkgs.nodejs_20
+    pkgs.python3
+    pkgs.python3Packages.flask
+    pkgs.python3Packages.matplotlib
+    pkgs.python3Packages.reportlab
+    pkgs.python3Packages.svglib
+    pkgs.python3Packages.lxml
+    pkgs.python3Packages.requests
+    pkgs.python3Packages.google-api-python-client
+    pkgs.python3Packages.google-auth-httplib2
+    pkgs.python3Packages.google-auth-oauthlib
   ];
 }

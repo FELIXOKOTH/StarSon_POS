@@ -1,12 +1,25 @@
-from fpdf import FPDF
+
+from reportlab.lib.pagesize import letter
+from reportlab.pdfgen import canvas
 import os
 
-def generate_pdf_receipt(receipt_data):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    for key, value in receipt_data.items():
-        pdf.cell(200, 10, txt=f"{key}: {value}", ln=True)
-    output_path = f"receipts/generated/receipt_{receipt_data['receipt_no']}.pdf"
-    pdf.output(output_path)
-    return output_path
+def generate_pdf(file_path, title, lines):
+  c = canvas.Canvas(file_path, pagesize=letter)
+  c.drawString(100, 750, title)
+  y = 730
+  for line in lines:
+    c.drawString(100, y, line)
+    y -= 20
+  c.save()
+  return file_path
+
+def generate_receipt_pdf(receipt_id, amount, customer_name):
+  file_path = f"static/receipts_{receipt_id}.pdf"
+  title = f"Receipt ID: {receipt_id}"
+  lines = [
+      f"Customer: {customer_name}",
+      f"Amount: KES{amount}",
+      "Thank you for using StarSon POS"
+  ]
+  return generate_pdf(file_path, title, lines)
+

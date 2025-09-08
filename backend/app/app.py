@@ -1,16 +1,16 @@
 import os
 import sys
 
-# Add the parent directory to the Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from flask import Flask, request, jsonify
 from routes.admin_routes import admin_routes
+from routes.receipt_routes import receipt_routes # Import the receipt blueprint
 # from api.image_analyzer import analyze_image_for_inventory
 from integrations.factory import get_revenue_service
+from ai.apillo import Apillo
 
 app = Flask(__name__)
 app.register_blueprint(admin_routes)
+app.register_blueprint(receipt_routes) # Register the receipt blueprint
 
 # Define a directory to store uploaded images
 UPLOAD_FOLDER = 'uploads'
@@ -18,6 +18,8 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+apillo = Apillo()
 
 @app.route("/")
 def home():
@@ -65,5 +67,28 @@ def create_invoice_route():
 
     return jsonify(response)
 
+@app.route('/api/apillo/insights', methods=['POST'])
+def get_apillo_insights():
+    transactions_dict = request.json
+    if not transactions_dict:
+        return jsonify({"error": "No transaction data provided"}), 400
+
+    # Get environmental insights
+    environmental_data = apillo.calculate_environmental_impact(transactions_dict)
+    
+    # Get social insights
+    social_data = apillo.calculate_social_impact(environmental_data)
+
+    # Get sustainability insights
+    sustainability_insights = apillo.get_sustainability_insights(environmental_data, social_data)
+
+    # Get operational insights
+    daily_summary = apillo.generate_daily_summary(transactions_dict)
+
+    return jsonify({
+        "sustainability_insights": sustainability_insights,
+        "daily_summary": daily_summary
+    })
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8080)

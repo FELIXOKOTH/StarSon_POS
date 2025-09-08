@@ -1,3 +1,9 @@
-flask
+reportlab
+svglib
+lxml
 requests
-qrcode
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+pyzbar
+pillow

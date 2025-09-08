@@ -14,6 +14,16 @@
     pkgs.firebase-tools
     pkgs.nodejs_20
     pkgs.docker
+    pkgs.python311Packages.reportlab
+    pkgs.python311Packages.svglib
+    pkgs.python311Packages.lxml
+    pkgs.python311Packages.requests
+    pkgs.python311Packages.google-api-python-client
+    pkgs.python311Packages.google-auth-httplib2
+    pkgs.python311Packages.google-auth-oauthlib
+    pkgs.python311Packages.pyzbar
+    pkgs.python311Packages.pillow
+    pkgs.zbar
   ];
 
   # Sets environment variables in the workspace
