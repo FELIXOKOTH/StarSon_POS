@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>StarSon Sustainability Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- ** NEW: Firebase SDK ** -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <!-- ** NEW: Firebase SDK (deferred) ** -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js" defer></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <style>
@@ -24,12 +24,13 @@
             color: white;
             line-height: 1.2rem;
             font-size: 0.8rem;
+            transition: width 0.5s ease-in-out;
         }
-        .controls-panel { 
-            display: flex; 
-            justify-content: space-around; 
-            align-items: center; 
-            padding: 1rem; 
+        .controls-panel {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 1rem;
             background-color: #f8f9fa;
             border-radius: 8px;
             margin-bottom: 2rem;
@@ -45,14 +46,14 @@
     <div class="container">
         <div class="panel controls-panel">
             <div>
-                <label><input type="checkbox" id="toggleDigitalImpact" checked onchange="toggleCharts()"> Show Operational Impact</label>
+                <label><input type="checkbox" id="toggleDigitalImpact" checked> Show Operational Impact</label>
             </div>
             <div>
-                <label><input type="checkbox" id="toggleGranularImpact" checked onchange="toggleCharts()"> Show Product Impact</label>
+                <label><input type="checkbox" id="toggleGranularImpact" checked> Show Product Impact</label>
             </div>
             <div>
                 <label for="chartTypeSelector">Product Impact Chart Type:</label>
-                <select id="chartTypeSelector" onchange="createGranularImpactChart(window.currentGranularData)">
+                <select id="chartTypeSelector">
                     <option value="bar">Bar</option>
                     <option value="doughnut">Doughnut</option>
                 </select>
@@ -65,13 +66,13 @@
                 <div>
                     <h4>Carbon Reduction (kg)</h4>
                     <div class="progress-bar-container">
-                        <div id="carbon-progress" class="progress-bar" style="width: 0%;">0 / {{ esg_goals.monthly_carbon_reduction_kg }}</div>
+                        <div id="carbon-progress" class="progress-bar" style="width: 0%;" data-goal="{{ esg_goals.monthly_carbon_reduction_kg }}">0 / {{ esg_goals.monthly_carbon_reduction_kg }}</div>
                     </div>
                 </div>
                 <div>
                     <h4>Water Saved (L)</h4>
                     <div class="progress-bar-container">
-                        <div id="water-progress" class="progress-bar" style="width: 0%;">0 / {{ esg_goals.monthly_water_saved_liters }}</div>
+                        <div id="water-progress" class="progress-bar" style="width: 0%;" data-goal="{{ esg_goals.monthly_water_saved_liters }}">0 / {{ esg_goals.monthly_water_saved_liters }}</div>
                     </div>
                 </div>
             </div>
@@ -124,22 +125,31 @@
     </footer>
 
 <script>
-    // ** NEW: Firebase Configuration **
+(function() {
+    // ** IMPORTANT: Replace with your actual Firebase configuration **
+    // Note: It is strongly recommended to load this from a secure backend endpoint
+    // rather than hardcoding it in a public file.
     const firebaseConfig = {
-      apiKey: "AIzaSyAe0CApe1dH9t6Bp-QWM5EIaBHCz6I7FEQ",
-      authDomain: "starson-pos-2025.firebaseapp.com",
-      databaseURL: "https://starson-pos-2025-default-rtdb.firebaseio.com",
-      projectId: "starson-pos-2025",
-      storageBucket: "starson-pos-2025.firebasestorage.app",
-      messagingSenderId: "365499300665",
-      appId: "1:365499300665:web:4a798546a730a86c9146e8",
-      measurementId: "G-0N09SYXCSV"
+      apiKey: "YOUR_API_KEY", // E.g., AIzaSy...
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID", // E.g., 1:sender:web:id
+      measurementId: "G-YOUR_MEASUREMENT_ID"
     };
 
-    if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
-        console.warn("Firebase is not configured. Please update firebaseConfig in public_dashboard.html");
-        document.getElementById('esg-insight').textContent = 'Real-time data connection failed: Firebase not configured.';
-    } else {
+    let digitalImpactChart, granularImpactChart;
+    let currentGranularData = {};
+
+    function initializeFirebase() {
+        if (!firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith("YOUR_")) {
+            console.warn("Firebase is not configured. Please update firebaseConfig in public_dashboard.html");
+            document.getElementById('esg-insight').textContent = 'Real-time data connection failed: Firebase not configured.';
+            return;
+        }
+
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         const transactionsRef = database.ref('transactions');
@@ -151,22 +161,23 @@
         });
     }
 
-    let digitalImpactChart, granularImpactChart;
-    window.currentGranularData = {};
-
-    // ** NEW: Apillo AI API Calls **
     async function getApilloInsights(transactions) {
         try {
+            const requestOptions = {
+                method: 'POST',
+                body: JSON.stringify(transactions),
+                headers: {'Content-Type': 'application/json'}
+            };
             const [envImpactRes, socialImpactRes, esgInsightRes] = await Promise.all([
-                fetch("/api/calculate_environmental_impact", { method: 'POST', body: JSON.stringify(transactions), headers: {'Content-Type': 'application/json'} }),
-                fetch("/api/calculate_social_impact", { method: 'POST', body: JSON.stringify(transactions), headers: {'Content-Type': 'application/json'} }),
-                fetch("/api/get_sustainability_insights", { method: 'POST', body: JSON.stringify(transactions), headers: {'Content-Type': 'application/json'} })
+                fetch("/api/calculate_environmental_impact", requestOptions),
+                fetch("/api/calculate_social_impact", requestOptions),
+                fetch("/api/get_sustainability_insights", requestOptions)
             ]);
 
             const environmental_impact = await envImpactRes.json();
             const social_impact = await socialImpactRes.json();
             const sustainability_insight = await esgInsightRes.json();
-            
+
             return { environmental_impact, social_impact, sustainability_insight };
 
         } catch (error) {
@@ -175,29 +186,44 @@
         }
     }
 
+    function updateProgressBar(elementId, currentValue, goalValue) {
+        const progressBar = document.getElementById(elementId);
+        if (!progressBar) return;
+
+        const goal = parseFloat(goalValue);
+        const current = parseFloat(currentValue) || 0;
+
+        let percentage = 0;
+        if (goal > 0) {
+            percentage = (current / goal) * 100;
+        }
+
+        const displayPercentage = Math.min(100, percentage);
+        progressBar.style.width = `${displayPercentage}%`;
+        progressBar.textContent = `${current.toFixed(2)} / ${goal}`;
+    }
+
     async function updateDashboard(transactions) {
         const { environmental_impact, social_impact, sustainability_insight } = await getApilloInsights(transactions);
 
         // Update KPIs
         document.getElementById('digital-receipts').textContent = environmental_impact.digital_receipts || 0;
         document.getElementById('community-give-back').textContent = `${social_impact.community_give_back_kes || 0} KES`;
-        document.getElementById('granular-carbon').textContent = `${environmental_impact.granular_carbon_footprint_kg || 0} kg`;
-        document.getElementById('granular-water').textContent = `${environmental_impact.granular_water_usage_l || 0} L`;
+        document.getElementById('granular-carbon').textContent = `${(environmental_impact.granular_carbon_footprint_kg || 0).toFixed(2)} kg`;
+        document.getElementById('granular-water').textContent = `${(environmental_impact.granular_water_usage_l || 0).toFixed(2)} L`;
         document.getElementById('trees-saved').textContent = (environmental_impact.trees_saved || 0).toFixed(4);
         document.getElementById('esg-insight').textContent = sustainability_insight.esg_insight || 'No insights available.';
 
         // Update Progress Bars
-        const carbonProgress = (environmental_impact.granular_carbon_footprint_kg / {{ esg_goals.monthly_carbon_reduction_kg }}) * 100;
-        const waterProgress = (environmental_impact.granular_water_usage_l / {{ esg_goals.monthly_water_saved_liters }}) * 100;
-        document.getElementById('carbon-progress').style.width = `${Math.min(100, carbonProgress)}%`;
-        document.getElementById('carbon-progress').textContent = `${environmental_impact.granular_carbon_footprint_kg || 0} / {{ esg_goals.monthly_carbon_reduction_kg }}`;
-        document.getElementById('water-progress').style.width = `${Math.min(100, waterProgress)}%`;
-        document.getElementById('water-progress').textContent = `${environmental_impact.granular_water_usage_l || 0} / {{ esg_goals.monthly_water_saved_liters }}`;
+        const carbonProgressEl = document.getElementById('carbon-progress');
+        const waterProgressEl = document.getElementById('water-progress');
+        updateProgressBar('carbon-progress', environmental_impact.granular_carbon_footprint_kg, carbonProgressEl.dataset.goal);
+        updateProgressBar('water-progress', environmental_impact.granular_water_usage_l, waterProgressEl.dataset.goal);
 
         // Update Charts
         createDigitalImpactChart(environmental_impact);
-        createGranularImpactChart(environmental_impact);
-        window.currentGranularData = environmental_impact;
+        currentGranularData = environmental_impact; // Store data for chart type changes
+        createGranularImpactChart(); // Re-create granular chart with new data
         toggleCharts();
     }
 
@@ -222,23 +248,32 @@
         });
     }
 
-    function createGranularImpactChart(data) {
+    function createGranularImpactChart() {
         if (granularImpactChart) granularImpactChart.destroy();
         const chartType = document.getElementById('chartTypeSelector').value;
         const granularCtx = document.getElementById('granularImpactChart').getContext('2d');
         const labels = ['Total Carbon Footprint (kg)', 'Total Water Usage (L)'];
-        const chartData = [data.granular_carbon_footprint_kg || 0, data.granular_water_usage_l || 0];
+        const chartData = [currentGranularData.granular_carbon_footprint_kg || 0, currentGranularData.granular_water_usage_l || 0];
+
+        const baseOptions = {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Total Resource Consumption' }
+            }
+        };
 
         let chartConfig;
         if (chartType === 'doughnut') {
             chartConfig = {
-                type: 'doughnut', data: { labels: labels, datasets: [{ data: chartData, backgroundColor: ['#d90429', '#0077b6'] }] },
-                options: { responsive: true, plugins: { legend: { position: 'top' }, title: { display: true, text: 'Total Resource Consumption' } } }
+                type: 'doughnut',
+                data: { labels, datasets: [{ data: chartData, backgroundColor: ['#d90429', '#0077b6'] }] },
+                options: { ...baseOptions, plugins: { ...baseOptions.plugins, legend: { position: 'top' } } }
             };
-        } else {
+        } else { // Bar chart
             chartConfig = {
-                type: 'bar', data: { labels: labels, datasets: [{ data: chartData, backgroundColor: ['#d90429', '#0077b6'] }] },
-                options: { responsive: true, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false }, title: { display: true, text: 'Total Resource Consumption' } } }
+                type: 'bar',
+                data: { labels, datasets: [{ data: chartData, backgroundColor: ['#d90429', '#0077b6'] }] },
+                options: { ...baseOptions, scales: { y: { beginAtZero: true } }, plugins: { ...baseOptions.plugins, legend: { display: false } } }
             };
         }
         granularImpactChart = new Chart(granularCtx, chartConfig);
@@ -251,11 +286,19 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('year').textContent = new Date().getFullYear();
-        // Initial chart creation with empty data
+
+        // Add event listeners
+        document.getElementById('toggleDigitalImpact').addEventListener('change', toggleCharts);
+        document.getElementById('toggleGranularImpact').addEventListener('change', toggleCharts);
+        document.getElementById('chartTypeSelector').addEventListener('change', createGranularImpactChart);
+
+        // Initial setup
+        initializeFirebase();
         createDigitalImpactChart({});
-        createGranularImpactChart({});
+        createGranularImpactChart();
         toggleCharts();
     });
+})();
 </script>
 
 </body>
