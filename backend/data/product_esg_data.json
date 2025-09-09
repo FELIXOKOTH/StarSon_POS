@@ -1,0 +1,28 @@
+{
+    "products": [
+        {
+            "product_id": "prod_001",
+            "name": "Organic Coffee Beans",
+            "carbon_footprint_kg_per_unit": 0.5,
+            "water_usage_l_per_unit": 140
+        },
+        {
+            "product_id": "prod_002",
+            "name": "Reusable Bamboo Cup",
+            "carbon_footprint_kg_per_unit": 0.1,
+            "water_usage_l_per_unit": 5
+        },
+        {
+            "product_id": "prod_003",
+            "name": "Fair-Trade Chocolate Bar",
+            "carbon_footprint_kg_per_unit": 0.2,
+            "water_usage_l_per_unit": 24
+        },
+        {
+            "product_id": "prod_004",
+            "name": "Stainless Steel Water Bottle",
+            "carbon_footprint_kg_per_unit": 1.2,
+            "water_usage_l_per_unit": 15
+        }
+    ]
+}
