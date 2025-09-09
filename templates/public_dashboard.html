@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Our Commitment to Sustainability</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f9f9f9; color: #333; }
+        header { background: #005f73; color: white; padding: 2em; text-align: center; }
+        header h1 { margin: 0; font-size: 2.5em; }
+        header p { font-size: 1.2em; opacity: 0.9; }
+        .container { max-width: 1200px; margin: 2em auto; padding: 0 2em; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2em; text-align: center; }
+        .kpi-card { background: white; padding: 2em; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .kpi-card h3 { margin-top: 0; color: #005f73; }
+        .kpi-value { font-size: 2.5em; font-weight: bold; color: #0a9396; }
+        .chart-section { margin-top: 4em; }
+        .chart-container { background: white; padding: 2em; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        footer { text-align: center; margin-top: 4em; padding: 2em; font-size: 0.9em; color: #666; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Our Collective Impact</h1>
+        <p>Transparency in our Environmental, Social, and Governance (ESG) efforts.</p>
+    </header>
+
+    <div class="container">
+        <h2>Today's Positive Impact</h2>
+        <div class="kpi-grid" id="kpi-grid">
+            <!-- KPIs will be loaded here dynamically -->
+        </div>
+
+        <div class="chart-section">
+            <h2>Detailed Breakdown</h2>
+            <div class="chart-container">
+                <canvas id="publicEnvironmentalChart"></canvas>
+            </div>
+        </div>
+
+        <div class="kpi-card" style="margin-top: 2em; background-color: #e9f5f5; text-align: left;">
+            <h3>Apillo's Sustainability Insight</h3>
+            <p id="esg-insight-text-public">Loading insight...</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Powered by StarSon POS & Apillo.ai</p>
+    </footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchPublicEsgData();
+    });
+
+    async function fetchPublicEsgData() {
+        try {
+            const response = await fetch('/apillo/public_esg_data');
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Failed to fetch data.');
+
+            updateKpis(data);
+            renderCharts(data);
+            updateInsight(data);
+
+        } catch (error) {
+            console.error("Error fetching public ESG data:", error);
+            document.getElementById('kpi-grid').innerHTML = '<p>Could not load ESG data at this time.</p>';
+        }
+    }
+
+    function updateKpis(data) {
+        const grid = document.getElementById('kpi-grid');
+        const env = data.environmental_impact;
+        const social = data.social_impact;
+
+        grid.innerHTML = `
+            <div class="kpi-card">
+                <h3>Carbon Footprint Reduction</h3>
+                <p class="kpi-value">${env.product_level_carbon_footprint_kg.toFixed(2)}</p>
+                <p>Kilograms</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Water Saved</h3>
+                <p class="kpi-value">${env.product_level_water_usage_l.toFixed(2)}</p>
+                <p>Liters</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Recyclable Packaging</h3>
+                <p class="kpi-value">${env.recyclable_packaging_percentage.toFixed(1)}%</p>
+                <p>Of items</p>
+            </div>
+            <div class="kpi-card">
+                <h3>Community Give-Back</h3>
+                <p class="kpi-value">${social.community_give_back_kes.toFixed(2)}</p>
+                <p>KES</p>
+            </div>
+        `;
+    }
+
+    function renderCharts(data) {
+        const ctx = document.getElementById('publicEnvironmentalChart').getContext('2d');
+        const env = data.environmental_impact;
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Carbon Footprint (kg)', 'Water Usage (L)'],
+                datasets: [{
+                    label: 'Environmental Impact',
+                    data: [env.product_level_carbon_footprint_kg, env.product_level_water_usage_l],
+                    backgroundColor: ['#00a896', '#02c39a'],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Environmental Impact Breakdown',
+                        font: { size: 18 }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateInsight(data) {
+        document.getElementById('esg-insight-text-public').innerText = data.sustainability_insight.esg_insight;
+    }
+
+</script>
+
+</body>
+</html>

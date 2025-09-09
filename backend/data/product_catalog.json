@@ -1,0 +1,41 @@
+
+{
+  "products": [
+    {
+      "id": "prod_001",
+      "name": "Organic Coffee Beans (1kg)",
+      "esg_metrics": {
+        "carbon_footprint_kg": 0.5,
+        "water_usage_l": 140,
+        "recyclable_packaging": true
+      }
+    },
+    {
+      "id": "prod_002",
+      "name": "Reusable Bamboo Cup",
+      "esg_metrics": {
+        "carbon_footprint_kg": 0.1,
+        "water_usage_l": 5,
+        "recyclable_packaging": true
+      }
+    },
+    {
+      "id": "prod_003",
+      "name": "Fair-Trade Chocolate Bar",
+      "esg_metrics": {
+        "carbon_footprint_kg": 0.2,
+        "water_usage_l": 20,
+        "recyclable_packaging": false
+      }
+    },
+    {
+      "id": "prod_004",
+      "name": "Stainless Steel Water Bottle",
+      "esg_metrics": {
+        "carbon_footprint_kg": 1.2,
+        "water_usage_l": 15,
+        "recyclable_packaging": true
+      }
+    }
+  ]
+}
