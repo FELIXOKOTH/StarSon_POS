@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>StarSon POS (AI-Powered)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ** NEW: Link to the unified stylesheet ** -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">StarSon POS (AI-Powered)</h1>
+        
+        {% if not saf_api_available %}
+            <div class="error-banner">
+                <strong>Warning:</strong> Safaricom M-Pesa API is not configured. Payments will not be processed.
+            </div>
+        {% endif %}
+
+        <div class="panel">
+            <h2>Actions</h2>
+            <button onclick="initiateMpesaPayment()" {% if not saf_api_available %}disabled{% endif %}>Initiate M-Pesa STK Push</button>
+            <button onclick="logManualPayment()">Log Manual Transaction</button>
+            <button onclick="generateESGReport()">Generate AI ESG Report</button>
+            <!-- ** NEW: Link to Public Dashboard ** -->
+            <a href="/public/esg_dashboard" target="_blank" class="button-link">View Public ESG Dashboard</a>
+        </div>
+
+        <div id="transaction-panel" class="panel" style="display:none;">
+            <h3>Transaction Status</h3>
+            <pre id="transaction-status"></pre>
+        </div>
+
+        <div id="esg-report-panel" class="panel" style="display:none;">
+            <h3>AI-Powered ESG & Sustainability Report</h3>
+            <div id="esg-insight"></div>
+            <div class="chart-container">
+                <canvas id="esgImpactChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for interactivity will be added here -->
+
+</body>
+</html>
