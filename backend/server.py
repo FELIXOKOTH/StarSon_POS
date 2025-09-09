@@ -75,6 +75,7 @@ def index():
     <button onclick="startNewManual()">Log a Manual Payment</button>
     <button onclick="getDailySummary()" id="summary-btn">Get Apillo's Daily Summary</button>
     <button onclick="getEsgReport()" id="esg-btn">Build ESG Dashboard</button>
+    <button onclick="getCorporateEsgReport()" id="corp-esg-btn">Get Corporate ESG Report</button>
 
     <div id="apillo-summary-panel" class="transaction-panel" style="display:none; background-color: #f0f8ff;"></div>
     
@@ -93,6 +94,12 @@ def index():
             </div>
         </div>
         <p><b>Apillo's Sustainability Insight:</b> <span id="esg-insight-text"></span></p>
+    </div>
+
+    <!-- ** NEW: Corporate ESG Panel ** -->
+    <div id="corporate-esg-panel" class="transaction-panel" style="display:none; background-color: #e3f2fd;">
+        <h3>Apillo's Corporate ESG Profile</h3>
+        <div id="corporate-esg-content"></div>
     </div>
     
     <div id="active-transactions"></div>
@@ -179,6 +186,38 @@ def index():
             btn.innerText = "Rebuild ESG Dashboard";
         }
     }
+
+    async function getCorporateEsgReport() {
+        const btn = document.getElementById('corp-esg-btn');
+        const panel = document.getElementById('corporate-esg-panel');
+        const contentDiv = document.getElementById('corporate-esg-content');
+        btn.disabled = true;
+        btn.innerText = "Analyzing...";
+
+        try {
+            const response = await fetch('/apillo/corporate_esg_report');
+            const report = await response.json();
+            if (!response.ok) throw new Error(report.error || 'Failed to get corporate ESG report.');
+
+            let content = '<h4>Supply Chain Transparency</h4>';
+            content += `<p>${report.supply_chain_transparency.description}</p>`;
+            content += `<p><b>Certified Fair-Trade:</b> ${report.supply_chain_transparency.certified_fair_trade_percentage}%</p>`;
+
+            content += '<hr><h4>Diversity & Inclusion</h4>';
+            content += `<p>${report.diversity_and_inclusion.description}</p>`;
+            content += `<p><b>Average Ownership Diversity Score:</b> ${report.diversity_and_inclusion.average_ownership_diversity_score} / 10</p>`;
+
+            contentDiv.innerHTML = content;
+            panel.style.display = 'block';
+
+        } catch (error) {
+            document.getElementById('error-banner').innerText = error.message;
+            document.getElementById('error-banner').style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Get Corporate ESG Report";
+        }
+    }
 </script>
 </body>
 </html>
@@ -217,6 +256,10 @@ def confirm_manual_route():
     transactions[txn_id]['details']['confirmation_time'] = datetime.datetime.now().isoformat()
     transactions[txn_id]['details']['confirmed_by'] = 'manual_cashier'
 
+    # --- NEW: Add corporate ESG data to transactions for simulation ---
+    transactions[txn_id]['details']['supplier_certified'] = random.choice([True, False])
+    transactions[txn_id]['details']['ownership_diversity_score'] = random.randint(1, 10)
+
     return jsonify({"status": "confirmed", "details": transactions[txn_id]['details']})
 
 @app.route('/apillo/daily_summary')
@@ -233,16 +276,27 @@ def get_esg_report_route():
     try:
         environmental_impact = apillo_agent.calculate_environmental_impact(transactions)
         social_impact = apillo_agent.calculate_social_impact(environmental_impact)
-        sustainability_insight = apillo_agent.get_sustainability_insights(environmental_impact, social_impact)
+        corporate_esg = apillo_agent.calculate_corporate_esg_profile(transactions)
+        sustainability_insight = apillo_agent.get_sustainability_insights(environmental_impact, social_impact, corporate_esg)
 
         return jsonify({
             "environmental_impact": environmental_impact,
             "social_impact": social_impact,
+            "corporate_esg": corporate_esg,
             "sustainability_insight": sustainability_insight
         })
     except Exception as e:
         print(f"Apillo ESG Error: {e}")
         return jsonify({"error": "Apillo encountered an error generating the ESG report."}), 500
+
+@app.route('/apillo/corporate_esg_report')
+def get_corporate_esg_report_route():
+    try:
+        corporate_esg = apillo_agent.calculate_corporate_esg_profile(transactions)
+        return jsonify(corporate_esg)
+    except Exception as e:
+        print(f"Apillo Corporate ESG Error: {e}")
+        return jsonify({"error": "Apillo encountered an error generating the corporate ESG report."}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, threaded=True)
