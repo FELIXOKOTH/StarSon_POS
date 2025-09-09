@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ _('login_title') }}</title> <!-- Assuming you'll add 'login_title' to translations -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .login-panel {
+            width: 100%;
+            max-width: 400px;
+        }
+        .registration-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="panel login-panel">
+        <h2 class="text-center">{{ _('login_heading') }}</h2> <!-- Assuming 'login_heading' -->
+        {% if error %}
+            <div class="error-banner">{{ error }}</div>
+        {% endif %}
+        <form method="post" action="{{ url_for('login') }}">
+            <div style="margin-bottom: 1rem;">
+                <label for="username" style="display: block; margin-bottom: 0.5rem;">{{ _('username') }}</label>
+                <input type="text" id="username" name="username" required style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label for="password" style="display: block; margin-bottom: 0.5rem;">{{ _('password') }}</label>
+                <input type="password" id="password" name="password" required style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+            </div>
+            <button type="submit" style="width: 100%;">{{ _('login_button') }}</button> <!-- Assuming 'login_button' -->
+        </form>
+        
+        <div class="registration-link">
+            <p>{{ _('new_business_prompt') }} <a href="{{ url_for('register') }}">{{ _('register_link') }}</a></p>
+        </div>
+    </div>
+</body>
+</html>

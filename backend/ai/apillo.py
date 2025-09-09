@@ -2,10 +2,13 @@ import random
 import json
 import os
 
+from backend.ai.analytics import AnalyticsEngine
+
 class Apillo:
     def __init__(self):
         self.name = "Apillo"
         self.product_esg_data = self._load_product_data()
+        self.analytics_engine = AnalyticsEngine()
 
     def _load_product_data(self):
         try:
@@ -85,3 +88,13 @@ class Apillo:
             pass
         
         return {"esg_insight": insight}
+
+    # --- NEW: Advanced Analytics Methods ---
+    def get_inventory_predictions(self, sales_data, current_stock):
+        return self.analytics_engine.predict_inventory(sales_data, current_stock)
+
+    def get_sales_forecast(self, sales_data):
+        return self.analytics_engine.forecast_sales(sales_data)
+
+    def get_customer_segments(self, customer_data):
+        return self.analytics_engine.segment_customers(customer_data)

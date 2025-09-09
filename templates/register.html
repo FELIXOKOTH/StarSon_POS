@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ _('register_title') }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .registration-form {
+            max-width: 500px;
+            margin: 3rem auto;
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box; /* Important */
+        }
+        .form-actions {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        .login-link {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="registration-form panel">
+            <h2 class="text-center">{{ _('register_heading') }}</h2>
+            <p class="text-center">{{ _('register_subheading') }}</p>
+            
+            {% if error %}
+                <div class="error-banner">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('register') }}">
+                <div class="form-group">
+                    <label for="business_name">{{ _('business_name') }}</label>
+                    <input type="text" id="business_name" name="business_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="username">{{ _('username') }} (Email)</label>
+                    <input type="email" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">{{ _('password') }}</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit">{{ _('register_button') }}</button>
+                </div>
+            </form>
+            
+            <div class="login-link">
+                <p>{{ _('already_have_account') }} <a href="{{ url_for('login') }}">{{ _('login_link') }}</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+    "admin": "password",
+    "okotieya404@gmail.com": {
+        "password": "F31433460",
+        "business_name": "BRIGHT_ARM ENTERPRISE",
+        "status": "pending",
+        "subscription_tier": "Basic",
+        "subscription_expiry_date": null,
+        "profile_complete": false,
+        "branches": [],
+        "logo_url": null,
+        "tax_id": null,
+        "receipt_config": {
+            "email_from": null,
+            "sms_provider": null,
+            "sms_api_key": null
+        }
+    }
+}
