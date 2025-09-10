@@ -1,0 +1,9 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "transactions": {
+      ".read": true
+    }
+  }
+}
