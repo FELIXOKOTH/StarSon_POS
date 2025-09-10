@@ -2,6 +2,7 @@
 from flask import Blueprint, render_template, request, jsonify
 import os
 import json
+import requests
 from werkzeug.utils import secure_filename
 from ai.gemini_vision_analyzer import GeminiVisionAnalyzer
 
@@ -27,21 +28,32 @@ def migration_page():
 
 @migration_bp.route('/migrate/analyze', methods=['POST'])
 def analyze_inventory_document():
-    """Handles document upload, analysis via Gemini, and returns structured JSON."""
-    if 'inventory_file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
-    
-    file = request.files['inventory_file']
-    if file.filename == '' or not allowed_file(file.filename):
-        return jsonify({"error": "Invalid or no file selected"}), 400
+    """Handles document analysis from a URL, invokes Gemini, and returns structured JSON."""
+    data = request.get_json()
+    if not data or 'file_url' not in data:
+        return jsonify({"error": "No file URL provided"}), 400
+
+    file_url = data['file_url']
 
     gemini_api_key = os.environ.get('GEMINI_API_KEY')
     if not gemini_api_key:
         return jsonify({"error": "Server configuration error: GEMINI_API_KEY not set."}), 500
 
-    filename = secure_filename(file.filename)
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(filepath)
+    try:
+        # Download the file from the URL
+        response = requests.get(file_url, stream=True)
+        response.raise_for_status()  # Raise an exception for bad status codes
+
+        # Create a temporary file path
+        filename = secure_filename(file_url.split('/')[-1])
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+
+        with open(filepath, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Failed to download file: {e}"}), 500
 
     try:
         analyzer = GeminiVisionAnalyzer(api_key=gemini_api_key)
