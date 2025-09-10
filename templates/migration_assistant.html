@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>StarSon POS - Migration Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .uploader-box {
+            border: 2px dashed #ccc;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .results-table th, .results-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .results-table th {
+            background-color: #f2f2f2;
+        }
+        .results-table td[contenteditable="true"] {
+            background-color: #fffacd; /* Light yellow to indicate editable fields */
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading-overlay" style="display: none;">
+        <p>Analyzing your document... This may take a moment.</p>
+    </div>
+
+    <header class="text-center" style="background-color: #007bff; color: white; padding: 2rem 1rem;">
+        <h1>Migration Assistant</h1>
+        <p>Migrate Your Inventory from Any System</p>
+    </header>
+
+    <div class="container">
+        <div id="upload-panel" class="panel">
+            <h2>Step 1: Upload Your Inventory Document</h2>
+            <p>Upload a file containing your inventory list. This can be a PDF, a spreadsheet (CSV, Excel), or even a clear photo of a printed list.</p>
+            <form id="migration-form">
+                <div class="uploader-box" onclick="document.getElementById('inventory_file').click();">
+                    <input type="file" name="inventory_file" id="inventory_file" required style="display: none;">
+                    <p id="uploader-text" style="margin-top: 1rem;">Drag & Drop your file here or click to select a file.</p>
+                </div>
+                <button type="submit" class="button">Analyze Inventory</button>
+            </form>
+        </div>
+
+        <div id="analysis-results" class="panel" style="display:none;">
+            <h2>Step 2: Review and Confirm</h2>
+            <p>Our AI has analyzed your document. Please review the extracted items below and click on any cell to make corrections before importing.</p>
+            <form id="import-form" action="/migrate/import" method="post">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Quantity</th>
+                            <th>SKU / Barcode</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-tbody">
+                        <!-- AI-generated results will be populated here -->
+                    </tbody>
+                </table>
+                <div style="margin-top: 2rem; text-align: right;">
+                    <button type="submit" class="button button-primary">Confirm and Import to POS</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="text-center" style="margin-top: 3rem; padding: 1rem; color: #6c757d; font-size: 0.9rem;">
+        <p>&copy; <span id="year"></span> StarSon Industries. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const migrationForm = document.getElementById('migration-form');
+        const inventoryFile = document.getElementById('inventory_file');
+        const uploaderText = document.getElementById('uploader-text');
+        const loadingOverlay = document.getElementById('loading');
+        const uploadPanel = document.getElementById('upload-panel');
+        const resultsPanel = document.getElementById('analysis-results');
+        const resultsTbody = document.getElementById('results-tbody');
+
+        inventoryFile.addEventListener('change', function() {
+            uploaderText.textContent = this.files[0] ? this.files[0].name : 'Drag & Drop or click to select';
+        });
+
+        migrationForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            if (!inventoryFile.files[0]) {
+                alert('Please select a file to analyze.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('inventory_file', inventoryFile.files[0]);
+
+            loadingOverlay.style.display = 'flex';
+
+            try {
+                const response = await fetch('/migrate/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'An unknown error occurred.');
+                }
+                
+                populateResultsTable(result.inventory_items);
+                uploadPanel.style.display = 'none';
+                resultsPanel.style.display = 'block';
+
+            } catch (error) {
+                console.error('Analysis failed:', error);
+                alert(`Analysis failed: ${error.message}`);
+            } finally {
+                loadingOverlay.style.display = 'none';
+            }
+        });
+
+        function populateResultsTable(items) {
+            resultsTbody.innerHTML = ''; // Clear previous results
+            if (!items || items.length === 0) {
+                resultsTbody.innerHTML = '<tr><td colspan="4">No items were extracted. Please try a different file.</td></tr>';
+                return;
+            }
+
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td contenteditable="true">${item.name || ''}</td>
+                    <td contenteditable="true">${item.quantity || ''}</td>
+                    <td contenteditable="true">${item.sku || ''}</td>
+                    <td contenteditable="true">${item.price || ''}</td>
+                `;
+                resultsTbody.appendChild(row);
+            });
+        }
+
+        // The form submission for the import process would be handled separately.
+        // For now, it will perform a standard form post.
+
+    </script>
+</body>
+</html>

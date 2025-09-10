@@ -1,16 +1,24 @@
+
 import os
 import sys
+from dotenv import load_dotenv
 
 from flask import Flask, request, jsonify
 from routes.admin_routes import admin_routes
 from routes.receipt_routes import receipt_routes # Import the receipt blueprint
+from routes.migration_routes import migration_bp # Import the migration blueprint
+
 # from api.image_analyzer import analyze_image_for_inventory
 from integrations.factory import get_revenue_service
 from ai.apillo import Apillo
 
+# Load environment variables from .env file
+load_dotenv()
+
 app = Flask(__name__)
 app.register_blueprint(admin_routes)
 app.register_blueprint(receipt_routes) # Register the receipt blueprint
+app.register_blueprint(migration_bp) # Register the migration blueprint
 
 # Define a directory to store uploaded images
 UPLOAD_FOLDER = 'uploads'
