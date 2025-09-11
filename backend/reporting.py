@@ -11,10 +11,31 @@ def generate_esg_report_content(apillo_agent: Apillo, transactions: dict) -> str
     """Generates the HTML content for the ESG report."""
     try:
         environmental_impact = apillo_agent.calculate_environmental_impact(transactions)
-        social_impact = apillo_agent.calculate_social_impact(environmental_impact)
-        sustainability_insight = apillo_agent.get_sustainability_insights(environmental_impact, social_impact)
+        social_impact = apillo_agent.calculate_social_impact(transactions)
+        corporate_esg = apillo_agent.calculate_corporate_esg_profile(transactions)
+        sustainability_insight = apillo_agent.get_sustainability_insights(environmental_impact, social_impact, corporate_esg)
 
-        # Create a simple HTML structure for the report
+        # Dynamically build the corporate ESG panel
+        corporate_esg_panel = ""
+        if corporate_esg:
+            profile_type = corporate_esg.get('profile_type', 'standard')
+            summary = corporate_esg.get('summary', corporate_esg.get('kpi_summary', ''))
+            
+            corporate_esg_panel += "<h2>Corporate ESG Profile</h2>"
+            if profile_type == 'corporate':
+                corporate_esg_panel += f"""
+                    <p><strong>ESG Score:</strong> {corporate_esg.get('esg_score', 'N/A')}</p>
+                    <p><strong>Supply Chain Transparency:</strong> {corporate_esg.get('supply_chain_transparency', 'N/A')}%</p>
+                    <p><strong>Waste Management Rating:</strong> {corporate_esg.get('waste_management_rating', 'N/A')}%</p>
+                """
+            else:
+                corporate_esg_panel += f"""
+                    <p><strong>Sustainability Rating:</strong> {corporate_esg.get('sustainability_rating', 'N/A')}</p>
+                """
+            corporate_esg_panel += f"<p><i>{summary}</i></p>"
+
+
+        # Create the full HTML structure for the report
         report_content = f"""
         <!DOCTYPE html>
         <html lang="en">
@@ -54,6 +75,10 @@ def generate_esg_report_content(apillo_agent: Apillo, transactions: dict) -> str
                 <div class="panel">
                     <h2>Social Impact</h2>
                      <p>Community Give-Back (KES): {social_impact['community_give_back_kes']}</p>
+                </div>
+                
+                <div class="panel">
+                    {corporate_esg_panel}
                 </div>
 
             </div>

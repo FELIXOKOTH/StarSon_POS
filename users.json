@@ -15,5 +15,21 @@
             "sms_provider": null,
             "sms_api_key": null
         }
+    },
+    "ramsat313@gmail.com": {
+        "password": "sweet1234",
+        "business_name": "Shermax",
+        "status": "pending",
+        "subscription_tier": "Basic",
+        "subscription_expiry_date": null,
+        "profile_complete": false,
+        "branches": [],
+        "logo_url": null,
+        "tax_id": null,
+        "receipt_config": {
+            "email_from": null,
+            "sms_provider": null,
+            "sms_api_key": null
+        }
     }
 }

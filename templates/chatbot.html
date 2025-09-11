@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ESG Chatbot</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <style>
+        .chat-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .chat-box {
+            height: 300px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+        .chat-input {
+            display: flex;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 0.5rem;
+        }
+        .chat-input button {
+            margin-left: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .message {
+            margin-bottom: 0.5rem;
+        }
+        .message.user {
+            text-align: right;
+            color: #007bff;
+        }
+        .message.bot {
+            text-align: left;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ESG Chatbot</h1>
+        <div class="chat-container">
+            <div class="chat-box" id="chat-box">
+                <div class="message bot">Hello! Ask me about our sustainability efforts.</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Type your question...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const query = userInput.value;
+
+            if (!query) return;
+
+            // Display user message
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'message user';
+            userMessageDiv.textContent = query;
+            chatBox.appendChild(userMessageDiv);
+
+            // Call chatbot API
+            const response = await fetch('/api/chatbot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ query: query })
+            });
+
+            const data = await response.json();
+
+            // Display bot response
+            const botMessageDiv = document.createElement('div');
+            botMessageDiv.className = 'message bot';
+            botMessageDiv.textContent = data.response;
+            chatBox.appendChild(botMessageDiv);
+
+            // Clear input and scroll down
+            userInput.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>

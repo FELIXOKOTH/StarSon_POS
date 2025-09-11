@@ -15,6 +15,8 @@ from backend.providers.mpesa import SafaricomMpesaProvider
 # Apillo AI Agent Import
 from backend.ai.apillo import Apillo
 from backend.ai.translator import ApilloTranslator
+from backend.ai.chatbot import Chatbot
+from backend.ai.analytics import AnalyticsEngine
 
 # Automated Reporting
 from backend.reporting import start_reporting_thread
@@ -27,9 +29,15 @@ from backend.ecommerce.woocommerce_connector import WooCommerceConnector
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 app.secret_key = os.urandom(24)
 
-apillo_agent = Apillo()
-apillo_translator = ApilloTranslator()
+# --- Core AI and Data Setup ---
 transactions = {}
+analytics_engine = AnalyticsEngine(transactions)
+apillo_config = {'business_type': 'standard'} 
+apillo_agent = Apillo(config=apillo_config)
+apillo_agent.analytics_engine = analytics_engine # Connect analytics engine to Apillo
+apillo_translator = ApilloTranslator()
+esg_chatbot = Chatbot(apillo_agent) # Initialize the chatbot
+
 
 # --- Firebase & Subscription Config ---
 FIREBASE_FUNCTION_URL = "https://us-central1-your-project-id.cloudfunctions.net/logTransaction"
@@ -182,7 +190,7 @@ def generate_qr():
     data = request.args.get('data', '')
     if not data:
         # Return a small, blank pixel if no data is provided
-        return send_file(io.BytesIO(b'''\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'''), mimetype='image/png')
+        return send_file(io.BytesIO(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'), mimetype='image/png')
 
     img = qrcode.make(data)
     buf = io.BytesIO()
@@ -215,8 +223,25 @@ def index():
 
     return render_template('admin_dashboard.html', subs=merchant_subscriptions, merchant_name=merchant_name)
 
+@app.route('/chatbot')
+def chatbot():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return render_template('chatbot.html')
+
 
 # --- Backend AI & Analytics API Endpoints ---
+
+@app.route("/api/chatbot", methods=['POST'])
+def api_chatbot():
+    """Endpoint to interact with the ESG chatbot."""
+    user_query = request.json.get('query')
+    if not user_query:
+        return jsonify({"error": "No query provided."}), 400
+    
+    response = esg_chatbot.get_response(user_query)
+    return jsonify({"response": response})
+
 
 @app.route("/api/predict_inventory", methods=['POST'])
 def api_predict_inventory():

@@ -40,6 +40,7 @@
             <button onclick="initiateMpesaPayment()" {% if not saf_api_available %}disabled{% endif %}>{{ _('initiate_mpesa_payment') }}</button>
             <button onclick="generateESGReport()">{{ _('generate_esg_report') }}</button>
             <a href="/public/esg_dashboard" target="_blank" class="button-link">{{ _('view_public_dashboard') }}</a>
+            <a href="/chatbot" class="button-link">ESG Chatbot</a>
             
             <!-- ... (Subscription-based buttons remain the same) ... -->
         </div>
