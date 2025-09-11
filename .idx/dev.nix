@@ -9,6 +9,8 @@
     pkgs.python311
     pkgs.python311Packages.pip
     pkgs.python311Packages.flask
+    pkgs.python311Packages.matplotlib
+    pkgs.python311Packages.pandas
     pkgs.python311Packages.python-dotenv
     pkgs.flutter
     pkgs.firebase-tools
@@ -24,6 +26,7 @@
     pkgs.python311Packages.pyzbar
     pkgs.python311Packages.pillow
     pkgs.zbar
+    pkgs.python311Packages.qrcode
   ];
 
   # Sets environment variables in the workspace
@@ -51,3 +54,4 @@
     };
   };
 }
+# Last updated: 2024-07-31T12:00:00Z

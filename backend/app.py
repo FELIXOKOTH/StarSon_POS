@@ -1,9 +1,15 @@
 from flask import Flask, send_from_directory, request, jsonify
 from routes.serve_pdf import serve_pdf_bp
+from routes.ai_routes import ai_bp
+from routes.migration_routes import migration_bp
 import json
 
 app = Flask(__name__)
+
+# Register the blueprints
 app.register_blueprint(serve_pdf_bp)
+app.register_blueprint(ai_bp)
+app.register_blueprint(migration_bp) 
 
 @app.route('/')
 def home():
