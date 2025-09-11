@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import datetime
 import io
 import json
@@ -165,11 +168,11 @@ def setup_wizard():
     
     # This is a placeholder for the multi-step onboarding process
     # In the future, this will render `setup_wizard.html`
-    return f"""<h1>Welcome, {session.get('username')}!</h1>
+    return f'''<h1>Welcome, {session.get('username')}!</h1>
                <p>Your account setup is not yet complete.</p>
                <p>Your account is currently PENDING ACTIVATION by our team.</p>
                <p>(This page will become a multi-step setup wizard)</p>
-               <a href="{url_for('index')}">Continue to Dashboard (Limited Access)</a>"""
+               <a href="{url_for('index')}">Continue to Dashboard (Limited Access)</a>'''
 
 
 @app.route('/logout')

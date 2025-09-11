@@ -1,2 +1,15 @@
 flask
 matplotlib
+pandas
+python-dotenv
+reportlab
+svglib
+lxml
+requests
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+pyzbar
+pillow
+zbar
+qrcode
