@@ -10,6 +10,11 @@ import urllib.request
 import time
 
 from flask import Flask, request, jsonify, render_template, send_from_directory, session, redirect, url_for, send_file
+from flask_sqlalchemy import SQLAlchemy
+
+# --- Custom Model Generation ---
+# This is our new automated model factory
+from backend.app.models.model_factory import generate_models_from_directory
 
 # Provider Imports
 from backend.integrations.daraja import SafaricomAPI
@@ -29,8 +34,22 @@ from backend.integrations.miti_pesa import MitiPesaConnector
 from backend.ecommerce.shopify_connector import ShopifyConnector
 from backend.ecommerce.woocommerce_connector import WooCommerceConnector
 
+# --- Flask App and Database Setup ---
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
 app.secret_key = os.urandom(24)
+
+# Configure the database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///main_database.db' # Using a new DB file
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+# --- Automatic Model Loading ---
+# Load all models defined in the datamodels directory
+MODELS_DIR = os.path.join(os.path.dirname(__file__), 'app', 'datamodels')
+GENERATED_MODELS = generate_models_from_directory(db, MODELS_DIR)
+
+# Make models accessible globally if needed, e.g., for shell
+# You can access them via GENERATED_MODELS['Product'], etc.
 
 # --- Core AI and Data Setup ---
 transactions = {}
@@ -168,7 +187,7 @@ def setup_wizard():
     
     # This is a placeholder for the multi-step onboarding process
     # In the future, this will render `setup_wizard.html`
-    return f'''<h1>Welcome, {session.get('username')}!</h1>
+    return f'''<h1>Welcome, {session.get("username")}!</h1>
                <p>Your account setup is not yet complete.</p>
                <p>Your account is currently PENDING ACTIVATION by our team.</p>
                <p>(This page will become a multi-step setup wizard)</p>
@@ -297,6 +316,66 @@ def sync_ecommerce():
         return jsonify({"status": "dormant", "message": "E-commerce integration is not active."}), 403
     return jsonify({"status": "inactive", "message": "Sync logic not implemented yet."})
 
+# --- Example CRUD for Generated Models ---
+
+@app.route('/api/products', methods=['GET', 'POST'])
+def handle_products():
+    # Retrieve the dynamically generated Product model
+    Product = GENERATED_MODELS.get('Product')
+    if not Product:
+        return jsonify({"error": "Product model not found or generated."}), 500
+
+    if request.method == 'POST':
+        data = request.get_json()
+        if not data or not 'sku' in data or not 'name' in data or not 'price' in data:
+            return jsonify({"error": "Missing required fields: sku, name, price"}), 400
+
+        # Create a new product instance
+        new_product = Product(
+            sku=data['sku'],
+            name=data['name'],
+            price=data['price'],
+            unit=data.get('unit', 'ea'),
+            tax_rate=data.get('tax_rate', 0.0),
+            cost=data.get('cost', 0.00),
+            is_active=data.get('is_active', True),
+            low_stock_threshold=data.get('low_stock_threshold')
+        )
+        db.session.add(new_product)
+        db.session.commit()
+        
+        product_data = {
+            'id': new_product.id,
+            'sku': new_product.sku,
+            'name': new_product.name,
+            'price': str(new_product.price), # Convert Decimal to string
+            'cost': str(new_product.cost),
+            'created_at': new_product.created_at.isoformat()
+        }
+
+        return jsonify(product_data), 201
+
+    if request.method == 'GET':
+        products_list = Product.query.all()
+        
+        # Serialize the list of products
+        serialized_products = []
+        for product in products_list:
+            serialized_products.append({
+                'id': product.id,
+                'sku': product.sku,
+                'name': product.name,
+                'category_id': product.category_id,
+                'unit': product.unit,
+                'tax_rate': product.tax_rate,
+                'price': str(product.price), # Convert Decimal to string for JSON
+                'cost': str(product.cost), # Convert Decimal to string
+                'is_active': product.is_active,
+                'low_stock_threshold': product.low_stock_threshold,
+                'created_at': product.created_at.isoformat() # Convert datetime for JSON
+            })
+            
+        return jsonify(serialized_products)
 
 # --- Public & Static Routes ---
 
@@ -308,6 +387,13 @@ def public_esg_dashboard():
 def send_static(path):
     return send_from_directory('../static', path)
 
+# --- Main Execution ---
 if __name__ == '__main__':
+    with app.app_context():
+        print("Creating all database tables...")
+        # This will create tables for all models discovered by the factory
+        db.create_all()
+        print("Database tables created.")
+
     start_reporting_thread(apillo_agent, transactions)
     app.run(host='0.0.0.0', port=8080, threaded=True)

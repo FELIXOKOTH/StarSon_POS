@@ -1,0 +1,20 @@
+{
+    "table_name": "customers",
+    "columns": {
+        "name": {
+            "type": "string",
+            "args": [100],
+            "nullable": false
+        },
+        "phone": {
+            "type": "string",
+            "args": [20],
+            "nullable": true
+        },
+        "email": {
+            "type": "string",
+            "args": [120],
+            "nullable": true
+        }
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "table_name": "categories",
+    "columns": {
+        "name": {
+            "type": "string",
+            "args": [100],
+            "nullable": false
+        },
+        "parent_id": {
+            "type": "integer",
+            "foreign_key": "categories.id",
+            "nullable": true
+        }
+    }
+}

@@ -1,0 +1,52 @@
+{
+    "table_name": "products",
+    "columns": {
+        "sku": {
+            "type": "string",
+            "args": [50],
+            "unique": true,
+            "nullable": false
+        },
+        "name": {
+            "type": "string",
+            "args": [100],
+            "nullable": false
+        },
+        "category_id": {
+            "type": "integer",
+            "foreign_key": "categories.id",
+            "nullable": true
+        },
+        "unit": {
+            "type": "string",
+            "args": [20],
+            "default": "ea"
+        },
+        "tax_rate": {
+            "type": "float",
+            "default": 0.00
+        },
+        "price": {
+            "type": "numeric",
+            "args": [12, 2],
+            "nullable": false
+        },
+        "cost": {
+            "type": "numeric",
+            "args": [12, 2],
+            "default": 0.00
+        },
+        "is_active": {
+            "type": "boolean",
+            "default": true
+        },
+        "low_stock_threshold": {
+            "type": "integer",
+            "nullable": true
+        },
+        "created_at": {
+            "type": "datetime",
+            "default": "datetime.utcnow"
+        }
+    }
+}
