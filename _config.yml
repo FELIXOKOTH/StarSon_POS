@@ -1,0 +1,1 @@
+exclude: [backend_venv, venv]
