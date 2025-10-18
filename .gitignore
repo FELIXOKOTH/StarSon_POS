@@ -1,1 +1,70 @@
-backend/venv/
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+backend_venv/
+.venv/
+
+# Environment files
+.env
+.env.* 
+
+# Python build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+*.egg
+*.whl
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+.coverage
+coverage.xml
+htmlcov/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# macOS / Windows
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+nohup.out
+
+# C extensions, compiled objects
+*.so
+*.dylib
+*.pyd
+
+# Python bytecode and caches
+*.pyc
+*.pyo
+
+# Node / frontend
+node_modules/
+
+# Archives and backups
+*.zip
+*.tar.gz
+*.egg
+*.bak
+
+# Misc
+*.sqlite3
